@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+ 
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+// THE PLATEFROM OWNER (YOU)
+model Admin {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  passwordHash String
+  projects     Project[] 
+  sessions     AdminSession[]
+  
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+// ADMIN SESSIONS
+model AdminSession {
+  id           String   @id @default(uuid())
+  adminId      String
+  refreshToken String   @unique
+  admin        Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+}
+
+// 2. THE TENANT (The App being built)
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  adminId     String
+  admin       Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  
+  apiKeys     ApiKey[]
+  users       User[]   
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 3. THE SDK ACCESS KEY
+model ApiKey {
+  id          String   @id @default(uuid())
+  keyHash     String   @unique // We will use SHA-256 here for fast lookups
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 4. THE END-USER (The person using the App)
+model User {
+  id           String    @id @default(uuid())
+  email        String
+  passwordHash String?   
+  googleId     String?   
+  
+  role         Role      @default(USER) 
+  
+  projectId    String
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  sessions     Session[] 
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Tenant & OAuth Isolation
+  @@unique([email, projectId]) 
+  @@unique([googleId, projectId]) 
+}
+
+// 5. THE END-USER SESSIONS
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+}
