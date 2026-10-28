@@ -100,3 +100,53 @@ export const loginAdmin = async (req: Request, res : Response) =>{
     res.status(500).json({error : "Internal server error."});
   }
 };
+
+
+export const refreshAdmin = async (req: Request, res: Response) => {
+  try { 
+
+    const refreshToken = req.cookies.kernel_refresh;
+
+    if (!refreshToken) {
+      res.status(401).json({ error: "No refresh token provided." });
+      return;
+    }
+
+    // 2. Verify the token has not expired
+    let payload: any;
+    try {
+      // currentServerTime > tokenExpirationTime JWT build in feature
+      payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || "fallback_refresh_secret");
+    } catch (err) {
+      res.status(403).json({ error: "Invalid or expired refresh token." });
+      return;
+    }
+
+    // 3. Verify the session actually exists in our PostgreSQL database
+    // (This allows us to manually remove sessions later if an account is compromised/hacked)
+    const session = await db.adminSession.findUnique({
+      where: { refreshToken }
+    });
+
+    if (!session) {
+      res.status(403).json({ error: "Session has been revoked or does not exist." });
+      return;
+    }
+
+    // 4. Generate a brand new 15-minute Access Token
+    const newAccessToken = jwt.sign(
+      { adminId: payload.adminId },
+      process.env.JWT_ACCESS_SECRET || "fallback_access_secret",
+      { expiresIn: '15m' }
+    );
+
+    res.status(200).json({
+      message: "Token refreshed successfully.",
+      accessToken: newAccessToken
+    });
+
+  } catch (error) {
+    console.error("Refresh error:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
