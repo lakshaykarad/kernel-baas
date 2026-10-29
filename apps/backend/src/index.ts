@@ -1,6 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser'
 import authRoutes from './modules/auth/auth.routes.js';
+import projectRoutes from './modules/projects/project.routes.js'; 
 
 const app = express();
 const PORT = 8000;
@@ -10,7 +11,7 @@ app.use(express.json());
 app.use(cookieParser());
 // 2. MUST HAVE THIS: Connects the URL "/api/auth" to the auth.routes.ts file you created
 app.use('/api/auth', authRoutes);
-
+app.use('/api/projects', projectRoutes )
 // The original sanity check route
 app.get('/', (req, res) => {
   res.json({ 
