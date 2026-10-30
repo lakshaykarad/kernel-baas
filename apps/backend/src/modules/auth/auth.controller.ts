@@ -39,7 +39,7 @@ export const setupAdmin = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Setup error:", error);
     res.status(500).json({ error: "Internal server error" });
-  }
+  } 
 };
 
 

@@ -5,14 +5,12 @@ export interface AdminRequest extends Request {
     adminId?: string;
 }
 
-
 export const requireAdmin = (req: AdminRequest, res: Response, next: NextFunction) => {
     // checking the client header 
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         res.status(401).json({ error: "Unauthorized. Deny-by-default policy enforced." })
-
         return;
     }
     // "Bearer eyJhbGciOiJIUzI1NiIsInR..." 
