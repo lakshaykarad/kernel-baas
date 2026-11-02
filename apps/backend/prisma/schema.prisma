@@ -17,6 +17,7 @@ model Admin {
   id           String         @id @default(uuid())
   email        String         @unique
   passwordHash String
+  isSuperAdmin Boolean        @default(false)  
   projects     Project[] 
   sessions     AdminSession[]
   
@@ -49,13 +50,14 @@ model Project {
 
 // 3. THE SDK ACCESS KEY
 model ApiKey {
-  id          String   @id @default(uuid())
-  keyHash     String   @unique // We will use SHA-256 here for fast lookups
+  id          String    @id @default(uuid())
+  keyHash     String    @unique
   projectId   String
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  expiresAt   DateTime? 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 // 4. THE END-USER (The person using the App)
