@@ -1,37 +1,43 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api, setAccessToken } from '../lib/api';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { api, setAccessToken } from "../lib/api";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     try {
-      const response = await api.post('/auth/login', { email, password });
-      setAccessToken(response.data.access_token);
-      navigate('/dashboard');
-    } catch (error: any) {
-      setError(error.response?.data?.error || 'Login failed');
+      const response = await api.post("/auth/login", { email, password });
+      setAccessToken(response.data.accessToken);
+
+      // Route based on whether this is the Master Admin or a normal Developer
+      if (response.data.isSuperAdmin) {
+        navigate("/super-admin");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Login failed");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      {/* Changed bg-gray-650 to bg-card and added border-border */}
-      <div className="p-8 bg-card text-card-foreground rounded-lg shadow-md w-96 border border-border">
-        <h2 className="mb-6 text-2xl font-bold text-center">Admin Login</h2>
-        {error && <p className="mb-4 text-sm text-red-500 text-center">{error}</p>}
-        
+    <div className="flex items-center justify-center min-h-screen p-4">
+      <div className="p-6 border border-gray-800 rounded w-96 bg-gray-900">
+        <h2 className="text-xl font-bold mb-6">Sign In to Kernel</h2>
+        {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
+
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
             type="email"
             placeholder="Email"
-            className="p-2 bg-background border border-input rounded focus:outline-none focus:ring-2 focus:ring-ring"
+            autoComplete="username"
+            className="p-2 bg-gray-950 border border-gray-700 rounded text-white"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -39,15 +45,20 @@ export default function Login() {
           <input
             type="password"
             placeholder="Password"
-            className="p-2 bg-background border border-input rounded focus:outline-none focus:ring-2 focus:ring-ring"
+            autoComplete="current-password"
+            className="p-2 bg-gray-950 border border-gray-700 rounded text-white"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="p-2 text-primary-foreground bg-primary rounded hover:opacity-90 transition-opacity font-medium">
-            Sign In
+          <button type="submit" className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Login
           </button>
         </form>
+
+        <p className="mt-4 text-sm text-gray-400 text-center">
+          New developer? <Link to="/register" className="text-blue-400 underline">Create an account</Link>
+        </p>
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
-import {Router} from 'express';
-import {createProject} from './project.controller.js';
-import {requireAdmin} from '../../middlewares/adminAuth.js';
-
+import { Router } from 'express';
+import { createProject, getMyProjects, getSuperAdminOverview } from './project.controller.js';
+import { requireAdmin, requireSuperAdmin } from '../../middlewares/adminAuth.js';
 
 const router = Router();
 

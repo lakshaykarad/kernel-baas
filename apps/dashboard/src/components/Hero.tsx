@@ -7,22 +7,19 @@ interface HeroProps {
 
 export default function Hero({ title, subtitle }: HeroProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-32 px-4 text-center">
-      <h1 className="text-5xl font-extrabold text-foreground mb-6 max-w-3xl">
+    <div className="flex flex-col items-center justify-center py-28 px-4 text-center">
+      <h1 className="text-4xl font-bold text-white mb-4 max-w-2xl">
         {title}
       </h1>
-      <p className="text-xl text-muted-foreground max-w-2xl mb-10">
+      <p className="text-lg text-gray-400 max-w-xl mb-8">
         {subtitle}
       </p>
-
-       <div className="flex justify-center pb-20">
-        <Link
-          to="/setup"
-          className="px-6 py-2 text-white bg-gray-700 rounded font-medium hover:bg-gray-700 "
-        >
-          Get Started
-        </Link>
-      </div>
+      <Link
+        to="/register"
+        className="px-6 py-3 bg-blue-600 text-white rounded font-medium hover:bg-blue-700"
+      >
+        Start Building (Free API Key)
+      </Link>
     </div>
   );
 }
