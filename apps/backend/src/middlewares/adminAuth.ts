@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from "jsonwebtoken";
+import { is } from 'zod/v4/locales/index.js';
 
 export interface AdminRequest extends Request {
     adminId?: string;
+    isSuperAdmin? : boolean;
 }
 
 export const requireAdmin = (req: AdminRequest, res: Response, next: NextFunction) => {
@@ -17,11 +19,21 @@ export const requireAdmin = (req: AdminRequest, res: Response, next: NextFunctio
     const token = authHeader.split(' ')[1]; //  token = eyJhbGciOiJIUzI1NiIsInR
 
     try {
-        const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET || "fallback_access_secret") as { adminId: string };
+        const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET || "fallback_access_secret") as  
+        { adminId: string; isSuperAdmin: boolean };
         req.adminId = payload.adminId;
+        req.isSuperAdmin = payload.isSuperAdmin;
         next();
     }catch(error){
         res.status(401).json({error : "Invalid or expired access token."})
     }
 
+}
+
+export const requireSuperAdmin = (req : AdminRequest, res : Response, next : NextFunction) =>{
+    if(!req.isSuperAdmin){
+        res.status(401).json({error : "Forbidden. Super-Admin access required."});
+        return; 
+    }
+    next();
 }

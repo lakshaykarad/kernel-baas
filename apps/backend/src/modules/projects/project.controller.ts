@@ -46,3 +46,36 @@ export const createProject = async (req: AdminRequest, res: Response) => {
         res.status(500).json({ error: "Internal server error." });
     }
 };
+
+
+// Add these two functions at the bottom of project.controller.ts:
+
+export const getMyProjects = async (req: AdminRequest, res: Response) => {
+  try {
+    const projects = await db.project.findMany({
+      where: { adminId: req.adminId },
+      orderBy: { createdAt: "desc" },
+    });
+    res.status(200).json({ projects });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to load projects." });
+  }
+};
+
+export const getSuperAdminOverview = async (req: AdminRequest, res: Response) => {
+  try {
+    const developers = await db.admin.findMany({
+      where: { isSuperAdmin: false },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+        _count: { select: { projects: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    res.status(200).json({ developers });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to load super-admin data." });
+  }
+};
