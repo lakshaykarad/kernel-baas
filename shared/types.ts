@@ -13,5 +13,13 @@ export interface NotificationEvent {
   body: string;                       // flat (was payload.body)
   metadata?: Record<string, unknown>; // flat (was payload.data), matches DB `metadata Json?`
   retryCount?: number;
-  createdAt: number;                  // epoch ms — JSON-safe
+  createdAt: Date;                  // epoch ms — JSON-safe
 }
+
+export const KAFKA_TOPICS = {
+  IN_APP : 'notify.in_app',
+  EMAIL : 'notify.email',
+  WHATSAPP : 'notify.whatsapp',
+  SMS : 'notify.sms',
+  DLQ : 'notify.dlq'
+} as const;
