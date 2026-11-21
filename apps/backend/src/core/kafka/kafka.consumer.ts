@@ -1,7 +1,9 @@
 import { Consumer, Kafka } from 'kafkajs';
 import { kafka } from './kafka.client.js';
 import { publishNotificationBatch } from './kafka.producer.js';
-import { KAFKA_TOPICS, NotificationChannel, NotificationEvent } from '../../../../../shared/types.js'
+import { KAFKA_TOPICS, NotificationChannel, NotificationEvent } from '../../../../../shared/types.js';
+import type { FailureMetadata } from '../../../../../shared/types.ts'
+import { buildFailureMetadata } from './utils/errors.js';
 
 const activeConsumers: Consumer[] = [];
 
@@ -11,8 +13,8 @@ export async function registerChannelWorker(
     handler: (event: NotificationEvent) => Promise<void>
 ): Promise<void> {
     const consumer = kafka.consumer({ groupId });
-    consumer.connect();
-    consumer.subscribe({ topic, fromBeginning: false });
+    await consumer.connect();
+    await consumer.subscribe({ topic, fromBeginning: false });
 
     await consumer.run({
         eachMessage: async ({ message }) => {
@@ -29,7 +31,10 @@ export async function registerChannelWorker(
                 if (retries >= 2) {
                     // Move to DLQ (Dead Letter Queue)
                     await publishNotificationBatch(KAFKA_TOPICS.DLQ, [
-                        { ...event, retryCount: retries },
+                        {
+                            ...event, retryCount: retries,
+                            _failure: buildFailureMetadata(err, topic),
+                        },
                     ]);
                 }else{
                     await publishNotificationBatch(topic, [
