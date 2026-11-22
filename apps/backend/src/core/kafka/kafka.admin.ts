@@ -1,5 +1,5 @@
 import { kafka } from './kafka.client.js';
-import { KAFKA_TOPICS } from '../../../../../shared/types.js';
+import { KAFKA_TOPICS } from '../../../../../shared/types.js'
 
 export const TOPIC_CONFIGS = [
     { topic: KAFKA_TOPICS.IN_APP, numPartitions: 6 },

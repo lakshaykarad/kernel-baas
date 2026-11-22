@@ -6,3 +6,5 @@ dist
 .DS_Store
 images
 package-lock.json
+.vscode
+index.html

@@ -1,3 +1,5 @@
+import { string } from "zod";
+
 // shared/types.ts  — DELETE KafkaNotificationPayload, replace NotificationEvent with this
 export type NotificationChannel = 'IN_APP' | 'EMAIL' | 'WHATSAPP' | 'SMS';
 export type NotificationPriority = 'HIGH' | 'BULK';
@@ -14,6 +16,7 @@ export interface NotificationEvent {
   metadata?: Record<string, unknown>; // flat (was payload.data), matches DB `metadata Json?`
   retryCount?: number;
   createdAt: Date;                  // epoch ms — JSON-safe
+  _failure?: FailureMetadata 
 }
 
 export const KAFKA_TOPICS = {
@@ -23,3 +26,11 @@ export const KAFKA_TOPICS = {
   SMS : 'notify.sms',
   DLQ : 'notify.dlq'
 } as const;
+
+
+export interface FailureMetadata  {
+  error : string,
+  stack? : string,
+  originalTopic : string,
+  failedAt : string
+}

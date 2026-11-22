@@ -111,7 +111,8 @@ export const loginAdmin = async(req : Request, res : Response) => {
     await db.adminSession.create({
       data: {
         adminId: admin.id,
-        refreshToken
+        refreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       }
     });
 
