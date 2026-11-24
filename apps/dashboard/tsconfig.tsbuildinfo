@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/hero.tsx","./src/components/login.tsx","./src/components/navbar.tsx","./src/components/setup.tsx","./src/lib/api.ts","./src/pages/developerdashboard.tsx","./src/pages/home.tsx","./src/pages/register.tsx","./src/pages/superadmindashboard.tsx"],"version":"5.9.3"}
