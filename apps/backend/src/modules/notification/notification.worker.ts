@@ -16,7 +16,7 @@ async function processInAppNotification(
             data: {
                 ...dbFields, // add info database colums -> { eventId: "e1", projectId: "p1", userId: "u1", channel: "IN_APP", priority: "HIGH", title: "Hello", body: "World" }
                 retryCount: retryCount ?? 0,
-                metadata : (metadata as Prisma.InputJsonValue) ?? Prisma.JsonNull, 
+                metadata: metadata ?? undefined,
                 createdAt: new Date(createdAt),
                 status: 'PENDING',
             },
@@ -25,7 +25,12 @@ async function processInAppNotification(
 
     } catch(err){
         // skip duplicate event
-        if( err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002'){
+        if (
+            typeof err === 'object' &&
+            err !== null &&
+            'code' in err &&
+            err.code === 'P2002'
+        ) {
             console.log( `[Idempotency] Skipping duplicate event: ${event.eventId}  `);
             return;
         }
