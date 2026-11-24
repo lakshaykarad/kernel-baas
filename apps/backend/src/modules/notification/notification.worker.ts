@@ -1,8 +1,11 @@
 import {Prisma, PrismaClient} from '@prisma/client';
 import {registerChannelWorker} from '../../core/kafka/kafka.consumer.js';
 import {KAFKA_TOPICS, NotificationEvent} from '../../../../../shared/types.js';
+import { meta } from 'zod/v4/core';
 
 const prisma = new PrismaClient(); 
+
+
 
 // In-App notification 
 async function processInAppNotification(
@@ -16,7 +19,7 @@ async function processInAppNotification(
             data: {
                 ...dbFields, // add info database colums -> { eventId: "e1", projectId: "p1", userId: "u1", channel: "IN_APP", priority: "HIGH", title: "Hello", body: "World" }
                 retryCount: retryCount ?? 0,
-                metadata: metadata ?? undefined,
+                metadata : metadata ?? undefined,
                 createdAt: new Date(createdAt),
                 status: 'PENDING',
             },

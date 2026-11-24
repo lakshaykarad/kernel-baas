@@ -4,6 +4,19 @@ import { string } from "zod";
 export type NotificationChannel = 'IN_APP' | 'EMAIL' | 'WHATSAPP' | 'SMS';
 export type NotificationPriority = 'HIGH' | 'BULK';
 
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonObject
+  | JsonValue[];
+  
+export interface JsonObject {
+  [key: string]: JsonValue;
+}
+
+
 export interface NotificationEvent {
   eventId: string;                    // ← REQUIRED: idempotency key
   projectId: string;
@@ -13,7 +26,7 @@ export interface NotificationEvent {
   recipient?: string;                 // optional: absent for IN_APP
   title?: string;                     // flat (was payload.title)
   body: string;                       // flat (was payload.body)
-  metadata?: Record<string, unknown>; // flat (was payload.data), matches DB `metadata Json?`
+  metadata?: JsonObject; // flat (was payload.data), matches DB `metadata Json?`
   retryCount?: number;
   createdAt: Date;                  // epoch ms — JSON-safe
   _failure?: FailureMetadata 
@@ -27,10 +40,11 @@ export const KAFKA_TOPICS = {
   DLQ : 'notify.dlq'
 } as const;
 
-
 export interface FailureMetadata  {
   error : string,
   stack? : string,
   originalTopic : string,
   failedAt : string
 }
+
+
