@@ -45,7 +45,7 @@ model Project {
   apiKeys     ApiKey[]
   users       User[]   
   notifications Notification[] 
-  
+  blasts        Blast[]           
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -150,4 +150,40 @@ model Notification {
 
   // Optional: "show all HIGH priority pending for project X"
   @@index([projectId, priority, status])
+}
+
+enum BlastStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model Blast {
+  id           String                 @id @default(uuid())
+
+  projectId    String
+  project      Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  channel      NotificationChannel
+  status       BlastStatus            @default(PENDING)
+  priority     NotificationPriority   @default(BULK)
+
+  title        String?
+  body         String
+  metadata     Json?
+
+  totalUsers   Int                    @default(0)
+  sentCount    Int                    @default(0)
+  failedCount  Int                    @default(0)
+
+  lastCursorId String?                // resume point
+  errorReason  String?
+  completedAt  DateTime?
+
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  @@index([projectId, status, createdAt])
 }

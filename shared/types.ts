@@ -4,18 +4,10 @@ import { string } from "zod";
 export type NotificationChannel = 'IN_APP' | 'EMAIL' | 'WHATSAPP' | 'SMS';
 export type NotificationPriority = 'HIGH' | 'BULK';
 
-export type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonObject
-  | JsonValue[];
-  
+export type JsonValue = | string | number | boolean | null | JsonObject | JsonValue[];
 export interface JsonObject {
   [key: string]: JsonValue;
 }
-
 
 export interface NotificationEvent {
   eventId: string;                    // ← REQUIRED: idempotency key
@@ -28,7 +20,7 @@ export interface NotificationEvent {
   body: string;                       // flat (was payload.body)
   metadata?: JsonObject; // flat (was payload.data), matches DB `metadata Json?`
   retryCount?: number;
-  createdAt: Date;                  // epoch ms — JSON-safe
+  createdAt: number;                  // epoch ms — JSON-safe
   _failure?: FailureMetadata 
 }
 
