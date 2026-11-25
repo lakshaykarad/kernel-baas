@@ -12,14 +12,13 @@ export async function markUserOfline(projectId : string, userId: string) : Promi
 }
 
 /*
-
 Returns a Set containing only the userIds that are currently online.
 */ 
 export async function filterOnlineUsers(projectId : string, userIds: string[]) : Promise<Set<string>>  {
     if (userIds.length === 0) {
         return new Set();
     }
-
+    
     const results = await redis.smismember(presenceKey(projectId), ...userIds);
     const onlineSet = new Set<string>();
 

@@ -12,7 +12,6 @@ export async function publshRealtimeEvent(event : RealtimeEnvelope) : Promise<vo
     await redis.publish(REALTIME_CHANNEL, JSON.stringify(event));
 }
 
-
 export async function subscribreRealtimeEvents(onEvent: (event: RealtimeEnvelope) => void ) : Promise<void> {
     const subscriber = createRedisSubscriber();
     await subscriber.subscribe(REALTIME_CHANNEL);
